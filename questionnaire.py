@@ -1,25 +1,7 @@
 import json
+import sys
 
-# PROJET QUESTIONNAIRE V3 : POO
-#
-# - Pratiquer sur la POO
-# - Travailler sur du code existant
-# - Mener un raisonnement
-#
-# -> Définir les entitées (données, actions)
-#
-# Question
-#    - titre       - str
-#    - choix       - (str)
-#    - bonne_reponse   - str
-#
-#    - poser()  -> bool
-#
-# Questionnaire
-#    - questions      - (Question)
-#
-#    - lancer()
-#
+
 
 class Question:
     def __init__(self, titre, choix, bonne_reponse):
@@ -76,8 +58,21 @@ class Questionnaire:
         questionnaire_data_questions = data["questions"]
         questions= [Question.from_json_data(i) for i in questionnaire_data_questions]
         return Questionnaire(questions, data["categorie"], data["titre"], data["difficulte"])
+    
+    def from_json_file(filename):
+        try:
+            file = open(filename, "r")
+            json_data = file.read()
+
+            file.close()
+            questionnaire_data = json.loads(json_data)
+        except:
+            print("Exception lors de la lecture ou l'ouverture du fichier")
+            return None
+        return Questionnaire.from_json_data(questionnaire_data)
 
     def lancer(self):
+
         score = 0
         nb_questions = len(self.questions)
 
@@ -98,17 +93,21 @@ class Questionnaire:
 
 
 
-#charger un fichier JSON
-
-filname = "cinema_alien_expert.json"
-file = open(filname, "r")
-json_data = file.read()
-
-file.close()
-questionnaire_data = json.loads(json_data)
+#Questionnaire.from_json_file("cinema_starwars_expert.json").lancer()
 
 
+if len(sys.argv) < 2:
+    print("ERREUR : vous devez specifier le nom du fichier json a charger")
+    exit(0)
 
-Questionnaire.from_json_data(questionnaire_data).lancer()
+json_filename = sys.argv[1]
+questionnaire = Questionnaire.from_json_file(json_filename)
+if questionnaire:
+    questionnaire.lancer()
 
-print()
+
+
+
+
+
+
